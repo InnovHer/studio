@@ -14,7 +14,7 @@
 body {
   font-family: 'Poppins', sans-serif;
   position: relative;
-  --bg-pattern-opacity: 0.05;
+  --bg-pattern-opacity: 0.15;
   --bg-pattern-color: hsl(var(--foreground));
 }
 
@@ -39,7 +39,7 @@ body::before {
 
 
 .dark body::before {
-    --bg-pattern-opacity: 0.1;
+    --bg-pattern-opacity: 0.2;
 }
 
 
