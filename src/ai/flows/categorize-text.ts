@@ -28,6 +28,11 @@ const CategorizeTextOutputSchema = z.object({
     .describe(
       'The confidence score (0-1) that the text belongs to the category.'
     ),
+  explanation: z
+    .string()
+    .describe(
+      'A brief explanation (1-2 sentences) of why the text was assigned its category.'
+    ),
 });
 export type CategorizeTextOutput = z.infer<typeof CategorizeTextOutputSchema>;
 
@@ -39,13 +44,13 @@ const prompt = ai.definePrompt({
   name: 'categorizeTextPrompt',
   input: {schema: CategorizeTextInputSchema},
   output: {schema: CategorizeTextOutputSchema},
-  prompt: `You are a text categorization expert. You will categorize the given text into one of the following categories:
+  prompt: `You are a text categorization expert. You will categorize the given text into one of the following categories and provide a brief explanation.
 
 Categories: {{{categories}}}
 
 Text: {{{text}}}
 
-Respond with a JSON object that contains the category the text belongs to and the confidence score (0-1) that the text belongs to the category.
+Respond with a JSON object that contains the category, the confidence score (0-1), and a brief, 1-2 sentence explanation for the categorization.
 `,
 });
 

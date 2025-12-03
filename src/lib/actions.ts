@@ -15,6 +15,7 @@ export type AnalysisResult = {
   inputText: string;
   category: 'Positive' | 'Negative' | 'Neutral';
   confidence: number;
+  explanation: string;
 };
 
 type State = {
@@ -49,6 +50,7 @@ export async function analyzeSentiment(
       inputText: text,
       category: aiResult.category as AnalysisResult['category'],
       confidence: aiResult.confidence,
+      explanation: aiResult.explanation,
     };
     
     try {
@@ -58,6 +60,7 @@ export async function analyzeSentiment(
             input_text: result.inputText,
             sentiment: result.category,
             confidence: result.confidence,
+            explanation: result.explanation,
             timestamp: serverTimestamp(),
         }).catch(console.error);
     } catch (dbError) {

@@ -4,4 +4,5 @@ export interface HistoryItem {
   sentiment: 'Positive' | 'Negative' | 'Neutral';
   confidence: number;
   timestamp: string; // ISO string
+  explanation?: string;
 }
