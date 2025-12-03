@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, ChangeEvent, useTransition } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState, useRef, ChangeEvent, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { analyzeSentiment } from '@/lib/actions';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ function SubmitButton() {
 }
 
 export default function SentimentForm() {
-  const [state, formAction] = useFormState(analyzeSentiment, initialState);
+  const [state, formAction] = useActionState(analyzeSentiment, initialState);
   const [text, setText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
