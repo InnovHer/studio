@@ -10,6 +10,7 @@ export default function Header() {
 
   const navItems = [
     { href: '/', label: 'Analyze' },
+    { href: '/batch', label: 'Batch' },
     { href: '/history', label: 'History' },
   ];
 
