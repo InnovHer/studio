@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from 'react';
-import { Pie, PieChart, Cell } from 'recharts';
+import { Pie, PieChart, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import type { AnalysisResult } from '@/lib/actions';
@@ -32,9 +32,13 @@ export default function SentimentResult({ result }: SentimentResultProps) {
   const { category, confidence } = result;
   const sentiment = sentimentConfig[category] || sentimentConfig.Neutral;
 
-  const chartData = useMemo(() => [
+  const pieChartData = useMemo(() => [
     { name: category, value: confidence, fill: sentiment.color },
     { name: 'Other', value: 1 - confidence, fill: 'hsl(var(--muted))' },
+  ], [category, confidence, sentiment.color]);
+
+  const barChartData = useMemo(() => [
+    { name: category, confidence: confidence * 100, fill: sentiment.color }
   ], [category, confidence, sentiment.color]);
 
   const chartConfig = {
@@ -69,7 +73,7 @@ export default function SentimentResult({ result }: SentimentResultProps) {
             &quot;{result.inputText.substring(0, 100)}{result.inputText.length > 100 ? '...' : ''}&quot;
           </p>
         </div>
-        <div className="flex items-center justify-center">
+        <div className="grid grid-cols-2 items-center justify-center gap-4">
           <ChartContainer config={chartConfig} className="mx-auto aspect-square h-[200px]">
             <PieChart>
               <ChartTooltip
@@ -77,7 +81,7 @@ export default function SentimentResult({ result }: SentimentResultProps) {
                 content={<ChartTooltipContent hideLabel hideIndicator />}
               />
               <Pie
-                data={chartData}
+                data={pieChartData}
                 dataKey="value"
                 nameKey="name"
                 innerRadius={60}
@@ -85,11 +89,29 @@ export default function SentimentResult({ result }: SentimentResultProps) {
                 startAngle={90}
                 endAngle={450}
               >
-                {chartData.map((entry, index) => (
+                {pieChartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} className="outline-none" />
                 ))}
               </Pie>
             </PieChart>
+          </ChartContainer>
+          <ChartContainer config={chartConfig} className="h-[200px] w-full">
+            <BarChart accessibilityLayer data={barChartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="name"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+              />
+              <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="confidence" radius={4}>
+                 {barChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
           </ChartContainer>
         </div>
       </CardContent>
