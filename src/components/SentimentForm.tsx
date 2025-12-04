@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ChangeEvent, useActionState } from 'react';
+import { useState, useRef, ChangeEvent, useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { analyzeSentiment } from '@/lib/actions';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +11,7 @@ import { AlertCircle, Loader2, UploadCloud } from 'lucide-react';
 import SentimentResult from './SentimentResult';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { AnalysisResult } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
 
 const initialState: { result: AnalysisResult | null; error: string | null } = {
   result: null,
@@ -31,10 +32,30 @@ export default function SentimentForm() {
   const [state, formAction] = useActionState(analyzeSentiment, initialState);
   const [text, setText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (state.error) {
+       toast({
+        variant: "destructive",
+        title: "Analysis Failed",
+        description: state.error,
+      });
+    }
+  }, [state.error, toast]);
+
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 1024 * 1024) { // 1MB limit
+          toast({
+              variant: "destructive",
+              title: "File Too Large",
+              description: "Please upload a file smaller than 1MB.",
+          });
+          return;
+      }
       const reader = new FileReader();
       reader.onload = (event) => {
         const fileContent = event.target?.result as string;
@@ -75,7 +96,7 @@ export default function SentimentForm() {
               <p className="mt-2 text-sm text-muted-foreground">
                 <span className="font-semibold text-primary">Click to upload</span> or drag and drop
               </p>
-              <p className="text-xs text-muted-foreground">.txt files only</p>
+              <p className="text-xs text-muted-foreground">.txt files only (max 1MB)</p>
             </div>
             <Input
               ref={fileInputRef}
@@ -94,7 +115,7 @@ export default function SentimentForm() {
         </div>
       </form>
 
-      {state.error && (
+      {state.error && !state.result && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>

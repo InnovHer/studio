@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, ChangeEvent, useActionState } from 'react';
+import { useState, useRef, ChangeEvent, useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { analyzeSentimentBatch } from '@/lib/actions';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,6 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { BatchAnalysisResult } from '@/lib/actions';
 import { BatchResultTable } from './BatchResultTable';
 import BatchComparisonCharts from './BatchComparisonCharts';
+import { useToast } from '@/hooks/use-toast';
 
 const initialState: { result: BatchAnalysisResult | null; error: string | null } = {
   result: null,
@@ -32,10 +33,29 @@ export default function BatchAnalysisForm() {
   const [state, formAction] = useActionState(analyzeSentimentBatch, initialState);
   const [text, setText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (state.error) {
+       toast({
+        variant: "destructive",
+        title: "Analysis Failed",
+        description: state.error,
+      });
+    }
+  }, [state.error, toast]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+            variant: "destructive",
+            title: "File Too Large",
+            description: "Please upload a file smaller than 5MB.",
+        });
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (event) => {
         const fileContent = event.target?.result as string;
@@ -76,7 +96,7 @@ export default function BatchAnalysisForm() {
               <p className="mt-2 text-sm text-muted-foreground">
                 <span className="font-semibold text-primary">Click to upload</span> or drag and drop
               </p>
-              <p className="text-xs text-muted-foreground">.txt files with one entry per line</p>
+              <p className="text-xs text-muted-foreground">.txt files with one entry per line (max 5MB)</p>
             </div>
             <Input
               ref={fileInputRef}
@@ -95,7 +115,7 @@ export default function BatchAnalysisForm() {
         </div>
       </form>
 
-      {state.error && (
+      {state.error && !state.result && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>

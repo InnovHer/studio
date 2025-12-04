@@ -7,7 +7,7 @@ import { getFirestore, collection, addDoc, serverTimestamp, writeBatch, doc } fr
 import { app } from '@/lib/firebase';
 
 const FormSchema = z.object({
-  text: z.string().min(1, {
+  text: z.string().trim().min(1, {
     message: 'Text input cannot be empty.',
   }),
 });
@@ -66,14 +66,15 @@ export async function analyzeSentiment(
         }).catch(console.error);
     } catch (dbError) {
         console.error("Firestore error:", dbError);
+        // Non-critical, so we don't block the user from seeing the result
     }
 
     return { result, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Sentiment analysis failed:', error);
     return {
       result: null,
-      error: 'Failed to analyze sentiment. Please try again later.',
+      error: error.message || 'Failed to analyze sentiment. The AI model may be temporarily unavailable.',
     };
   }
 }
@@ -89,7 +90,7 @@ type BatchState = {
 }
 
 const BatchFormSchema = z.object({
-  text: z.string().min(1, {
+  text: z.string().trim().min(1, {
     message: 'Text input cannot be empty.',
   }),
 });
@@ -110,7 +111,7 @@ export async function analyzeSentimentBatch(
   }
 
   const { text } = validatedFields.data;
-  const texts = text.split('\n').filter(t => t.trim() !== '');
+  const texts = text.split('\n').map(t => t.trim()).filter(t => t !== '');
 
   if (texts.length === 0) {
     return {
@@ -124,6 +125,13 @@ export async function analyzeSentimentBatch(
       texts,
       categories: 'Positive, Negative, Neutral',
     });
+
+    if (!aiResult.results || aiResult.results.length === 0) {
+        return {
+            result: null,
+            error: 'The analysis returned no results. Please check your input and try again.',
+        }
+    }
 
     const results: AnalysisResult[] = aiResult.results;
 
@@ -146,14 +154,15 @@ export async function analyzeSentimentBatch(
       batch.commit().catch(console.error);
     } catch (dbError) {
       console.error("Firestore batch write error:", dbError);
+       // Non-critical, so we don't block the user from seeing the result
     }
 
     return { result: { results }, error: null };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Batch sentiment analysis failed:', error);
     return {
       result: null,
-      error: 'Failed to analyze sentiment for the batch. Please try again later.',
+      error: error.message || 'Failed to analyze sentiment for the batch. The AI model may be temporarily unavailable.',
     };
   }
 }
