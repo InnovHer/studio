@@ -12,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { AnalysisResult } from '@/lib/actions';
+import { ExportResults } from './ExportResults';
 
 interface BatchResultTableProps {
   results: AnalysisResult[];
@@ -36,36 +37,39 @@ export function BatchResultTable({ results }: BatchResultTableProps) {
   }
   
   return (
-    <div className="rounded-lg border bg-card">
-      <Table>
-        <TableCaption>A list of your batch sentiment analyses.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[40%]">Text</TableHead>
-            <TableHead>Sentiment</TableHead>
-            <TableHead>Confidence</TableHead>
-            <TableHead>Explanation</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {results.map((item, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">
-                <p className="truncate max-w-xs xl:max-w-md">
-                  {item.inputText}
-                </p>
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline" className={cn('font-semibold', sentimentColors[item.category] || sentimentColors.Neutral)}>
-                  {item.category}
-                </Badge>
-              </TableCell>
-              <TableCell>{(item.confidence * 100).toFixed(1)}%</TableCell>
-              <TableCell className="text-sm text-muted-foreground">{item.explanation}</TableCell>
+    <div className="space-y-4">
+      <ExportResults results={results} />
+      <div className="rounded-lg border bg-card">
+        <Table>
+          <TableCaption>A list of your batch sentiment analyses.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[40%]">Text</TableHead>
+              <TableHead>Sentiment</TableHead>
+              <TableHead>Confidence</TableHead>
+              <TableHead>Explanation</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {results.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">
+                  <p className="truncate max-w-xs xl:max-w-md">
+                    {item.inputText}
+                  </p>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={cn('font-semibold', sentimentColors[item.category] || sentimentColors.Neutral)}>
+                    {item.category}
+                  </Badge>
+                </TableCell>
+                <TableCell>{(item.confidence * 100).toFixed(1)}%</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{item.explanation}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
