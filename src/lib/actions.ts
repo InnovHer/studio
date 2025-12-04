@@ -28,12 +28,6 @@ export async function analyzeSentiment(
   prevState: State,
   formData: FormData
 ): Promise<State> {
-  // Simulate an API failure for testing
-  return {
-    result: null,
-    error: 'This is a test error. The AI model is offline.',
-  };
-
   const validatedFields = FormSchema.safeParse({
     text: formData.get('text'),
   });
