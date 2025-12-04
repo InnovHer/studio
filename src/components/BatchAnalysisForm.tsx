@@ -11,6 +11,7 @@ import { AlertCircle, Loader2, UploadCloud } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { BatchAnalysisResult } from '@/lib/actions';
 import { BatchResultTable } from './BatchResultTable';
+import BatchComparisonCharts from './BatchComparisonCharts';
 
 const initialState: { result: BatchAnalysisResult | null; error: string | null } = {
   result: null,
@@ -102,7 +103,12 @@ export default function BatchAnalysisForm() {
         </Alert>
       )}
 
-      {state.result && <BatchResultTable results={state.result.results} />}
+      {state.result && (
+        <div className="space-y-8">
+            <BatchComparisonCharts results={state.result.results} />
+            <BatchResultTable results={state.result.results} />
+        </div>
+      )}
     </div>
   );
 }
