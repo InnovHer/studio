@@ -15,12 +15,46 @@ import { Bot, FileClock, Home, Layers, Moon, Sun, PieChart } from 'lucide-react'
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { Button } from './ui/button';
+import { useEffect, useState } from 'react';
+
+function ThemeToggle() {
+    const { theme, setTheme } = useTheme();
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    if (!isClient) {
+        return null;
+    }
+
+    return (
+        <div className="flex items-center justify-center gap-1 rounded-full border bg-background p-1 group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:p-0">
+            <Button
+                size="icon"
+                variant={theme === 'light' ? 'secondary' : 'ghost'}
+                className="rounded-full"
+                onClick={() => setTheme('light')}
+            >
+                <Sun />
+            </Button>
+            <Button
+                size="icon"
+                variant={theme === 'dark' ? 'secondary' : 'ghost'}
+                className="rounded-full"
+                onClick={() => setTheme('dark')}
+            >
+                <Moon />
+            </Button>
+        </div>
+    );
+}
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
-  const { theme, setTheme } = useTheme();
-
+  
   const handleLinkClick = () => {
     setOpenMobile(false);
   };
@@ -60,24 +94,7 @@ export default function AppSidebar() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center justify-center gap-1 rounded-full border bg-background p-1 group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:p-0">
-          <Button
-            size="icon"
-            variant={theme === 'light' ? 'secondary' : 'ghost'}
-            className="rounded-full"
-            onClick={() => setTheme('light')}
-          >
-            <Sun />
-          </Button>
-          <Button
-            size="icon"
-            variant={theme === 'dark' ? 'secondary' : 'ghost'}
-            className="rounded-full"
-            onClick={() => setTheme('dark')}
-          >
-            <Moon />
-          </Button>
-        </div>
+        <ThemeToggle />
       </SidebarFooter>
     </Sidebar>
   );
