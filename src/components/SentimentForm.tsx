@@ -33,6 +33,13 @@ export default function SentimentForm() {
   const [text, setText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  
+  useEffect(() => {
+    const savedText = localStorage.getItem('sentimatic-single-text');
+    if (savedText) {
+      setText(savedText);
+    }
+  }, []);
 
   useEffect(() => {
     if (state.error) {
@@ -43,6 +50,12 @@ export default function SentimentForm() {
       });
     }
   }, [state.error, toast]);
+  
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+      const newText = e.target.value;
+      setText(newText);
+      localStorage.setItem('sentimatic-single-text', newText);
+  }
 
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -60,6 +73,7 @@ export default function SentimentForm() {
       reader.onload = (event) => {
         const fileContent = event.target?.result as string;
         setText(fileContent);
+        localStorage.setItem('sentimatic-single-text', fileContent);
       };
       reader.readAsText(file);
     }
@@ -76,7 +90,7 @@ export default function SentimentForm() {
             placeholder="Type or paste your text here..."
             className="min-h-[150px] text-base bg-card"
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
             required
           />
         </div>

@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Bot, FileClock, Home, Layers, Moon, Sun } from 'lucide-react';
+import { Bot, FileClock, Home, Layers, Moon, Sun, PieChart } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { Button } from './ui/button';
@@ -28,6 +28,7 @@ export default function AppSidebar() {
   const navItems = [
     { href: '/', label: 'Analyze', icon: <Home /> },
     { href: '/batch', label: 'Batch', icon: <Layers /> },
+    { href: '/summary', label: 'Summary', icon: <PieChart /> },
     { href: '/history', label: 'History', icon: <FileClock /> },
   ];
 

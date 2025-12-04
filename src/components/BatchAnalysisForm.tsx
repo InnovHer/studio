@@ -36,6 +36,13 @@ export default function BatchAnalysisForm() {
   const { toast } = useToast();
 
   useEffect(() => {
+    const savedText = localStorage.getItem('sentimatic-batch-text');
+    if (savedText) {
+      setText(savedText);
+    }
+  }, []);
+
+  useEffect(() => {
     if (state.error) {
        toast({
         variant: "destructive",
@@ -44,6 +51,12 @@ export default function BatchAnalysisForm() {
       });
     }
   }, [state.error, toast]);
+  
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+      const newText = e.target.value;
+      setText(newText);
+      localStorage.setItem('sentimatic-batch-text', newText);
+  }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,6 +73,7 @@ export default function BatchAnalysisForm() {
       reader.onload = (event) => {
         const fileContent = event.target?.result as string;
         setText(fileContent);
+        localStorage.setItem('sentimatic-batch-text', fileContent);
       };
       reader.readAsText(file);
     }
@@ -76,7 +90,7 @@ export default function BatchAnalysisForm() {
             placeholder="Type or paste your text here, with each entry on a new line..."
             className="min-h-[200px] text-base bg-card"
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTextChange}
             required
           />
         </div>
