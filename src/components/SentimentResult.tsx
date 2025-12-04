@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Smile, Frown, Meh, Lightbulb } from 'lucide-react';
 import type { AnalysisResult } from '@/lib/actions';
 import { Separator } from './ui/separator';
+import { ExportResults } from './ExportResults';
 
 interface SentimentResultProps {
   result: AnalysisResult;
@@ -65,7 +66,7 @@ export default function SentimentResult({ result }: SentimentResultProps) {
           Here is the sentiment breakdown of your text.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-8">
+      <CardContent className="grid gap-6">
         <div className="grid sm:grid-cols-2 gap-8">
             <div className="flex flex-col items-center justify-center gap-4 p-6 rounded-lg bg-card-foreground/5">
               <div className="flex items-center gap-3">
@@ -122,6 +123,10 @@ export default function SentimentResult({ result }: SentimentResultProps) {
                 </BarChart>
               </ChartContainer>
             </div>
+        </div>
+
+        <div className="px-6">
+            <ExportResults results={[result]} />
         </div>
 
         <Separator />
