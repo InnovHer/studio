@@ -7,6 +7,10 @@ import SummaryDashboard from '@/components/SummaryDashboard';
 
 async function getHistory(): Promise<HistoryItem[] | { error: string }> {
   try {
+    // Ensure Firebase project ID is available
+    if (!process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
+      throw new Error('Firebase project ID is not configured. Please check your .env file.');
+    }
     const firestore = getFirestore(app);
     const historyCollection = collection(firestore, 'sentimatic_history');
     const q = query(historyCollection, orderBy('timestamp', 'desc'));
@@ -33,10 +37,16 @@ async function getHistory(): Promise<HistoryItem[] | { error: string }> {
     return history;
   } catch (error: any) {
     console.error("Error fetching history:", error);
-    if (error.code === 'failed-precondition' || error.message.includes('firestore/permission-denied')) {
-        return { error: 'Firestore is not configured correctly. Please check your Firebase project setup and security rules.' };
+    if (error.code === 'permission-denied' || (error.message && error.message.includes('permission-denied'))) {
+        return { error: 'Firestore permission denied. Please check your security rules in the Firebase console.' };
     }
-    return { error: 'Could not fetch analysis history. Please try again later.' };
+     if (error.message && error.message.includes('Firebase project ID is not configured')) {
+        return { error: 'Your Firebase project is not configured correctly. Please check your environment variables.' };
+    }
+    if (error.message && error.message.includes('firestore.googleapis.com')) {
+        return { error: 'The Cloud Firestore API is not enabled for your project. Please enable it in the Google Cloud console and refresh the page.' };
+    }
+    return { error: 'Could not fetch analysis history. Please ensure your Firebase project is set up correctly and try again later.' };
   }
 }
 
